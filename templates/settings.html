@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% block title %}ตั้งค่าพารามิเตอร์และการคำนวณ{% endblock %}
+{% block page_id %}settings{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 20px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); color: #38bdf8; font-size: 11.5px; font-weight: 700; margin-bottom: 8px;">
+                <i class="bi bi-sliders"></i> ตั้งค่าการทำงานของระบบ
+            </div>
+            <h1 style="font-size: 26px; font-weight: 800; color: #f8fafc; margin: 0 0 4px 0;">พารามิเตอร์การคำนวณและอัตราค่าไฟฟ้า</h1>
+            <p style="color: #94a3b8; font-size: 13.5px; margin: 0;">กำหนดค่าพารามิเตอร์ทางการเงิน การรับซื้อไฟฟ้า และต้นทุนการติดตั้ง</p>
+        </div>
+
+        {% if is_admin %}
+        <a href="{{ url_for('admin_packages') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #10b981); border: none; font-weight: 700; font-size: 13px; padding: 9px 18px; border-radius: 8px; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <i class="bi bi-box-seam-fill"></i> จัดการแพ็กเกจโซลาร์เซลล์ (CRUD)
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-3">
+        <!-- Financial Settings -->
+        <div class="col-lg-7">
+            <div class="card" style="padding: 24px;">
+                <h6 class="card-title mb-4" style="font-size: 16px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-currency-dollar" style="color: #34d399;"></i> พารามิเตอร์ทางการเงินและการไฟฟ้า (PEA)
+                </h6>
+
+                <div class="settings-form" id="settings-form">
+                    <!-- Electricity Rate -->
+                    <div class="form-group mb-3">
+                        <label for="electricity_rate" style="font-size: 13px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">
+                            <i class="bi bi-plug-fill" style="color:#fbbf24;margin-right:6px;"></i>
+                            อัตราค่าไฟฟ้าเฉลี่ย PEA (บาท / kWh) *
+                        </label>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <input type="number" id="electricity_rate" step="0.01" min="1" max="20"
+                                   value="{{ settings.electricity_rate }}" placeholder="4.50" class="form-control"
+                                   style="background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 9px 12px; border-radius: 8px;">
+                            <span style="font-size:13px;color:#94a3b8;white-space:nowrap;font-weight:600;">บาท / kWh</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;">
+                            อัตราค่าไฟฟ้าฐานรวม Ft สำหรับที่อยู่อาศัยและธุรกิจขนาดย่อม (PEA Residential Tariff)
+                        </div>
+                    </div>
+
+                    <!-- Buyback Rate -->
+                    <div class="form-group mb-3">
+                        <label for="pea_buyback_rate" style="font-size: 13px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">
+                            <i class="bi bi-arrow-left-right" style="color:#38bdf8;margin-right:6px;"></i>
+                            อัตรารับซื้อไฟฟ้าคืน PEA Solar Citizen (บาท / kWh)
+                        </label>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <input type="number" id="pea_buyback_rate" step="0.01" min="0" max="10"
+                                   value="{{ settings.pea_buyback_rate or 2.20 }}" placeholder="2.20" class="form-control"
+                                   style="background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 9px 12px; border-radius: 8px;">
+                            <span style="font-size:13px;color:#94a3b8;white-space:nowrap;font-weight:600;">บาท / kWh</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;">
+                            โครงการโซลาร์ภาคประชาชน สัญญา 10 ปี (อัตรา 2.20 บาท/หน่วย)
+                        </div>
+                    </div>
+
+                    <!-- Daytime Consumption Ratio -->
+                    <div class="form-group mb-3">
+                        <label for="daytime_ratio" style="font-size: 13px; font-weight: 600; color: #e2e8f0; display: block; margin-bottom: 6px;">
+                            <i class="bi bi-sun-fill" style="color:#f59e0b;margin-right:6px;"></i>
+                            สัดส่วนการใช้ไฟช่วงกลางวันเฉลี่ย (Daytime Usage Ratio)
+                        </label>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <input type="number" id="daytime_ratio" step="0.05" min="0.1" max="1.0"
+                                   value="{{ settings.daytime_ratio or 0.65 }}" placeholder="0.65" class="form-control"
+                                   style="background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 9px 12px; border-radius: 8px;">
+                            <span style="font-size:13px;color:#94a3b8;white-space:nowrap;font-weight:600;">(เช่น 0.65 = 65%)</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: #64748b; margin-top: 4px;">
+                            สัดส่วนพลังงานที่ใช้ตรงช่วงแดดออก (08:30 - 16:30 น.) เพื่อลดค่าไฟเต็มหน่วย
+                        </div>
+                    </div>
+
+                    <hr style="border-color: rgba(148,163,184,0.15); margin: 20px 0;">
+                    <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:14px;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:6px;">
+                        <i class="bi bi-solar-panel" style="color:#10b981;"></i>
+                        ราคาติดตั้งระบบโซลาร์มาตรฐาน (บาท)
+                    </div>
+
+                    <!-- System Costs Grid -->
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:10px;margin-bottom:20px;">
+                        <div>
+                            <label for="cost_3kw" style="text-align:center;display:block;margin-bottom:6px;">
+                                <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">3 kW</span>
+                            </label>
+                            <input type="number" id="cost_3kw" step="1000" min="10000" max="999999"
+                                   value="{{ settings.system_costs.get('3', 95000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label for="cost_5kw" style="text-align:center;display:block;margin-bottom:6px;">
+                                <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#34d399;">5 kW ⭐</span>
+                            </label>
+                            <input type="number" id="cost_5kw" step="1000" min="10000" max="999999"
+                                   value="{{ settings.system_costs.get('5', 150000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1.5px solid #10b981; color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label for="cost_10kw" style="text-align:center;display:block;margin-bottom:6px;">
+                                <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">10 kW</span>
+                            </label>
+                            <input type="number" id="cost_10kw" step="1000" min="10000" max="999999"
+                                   value="{{ settings.system_costs.get('10', 250000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label for="cost_15kw" style="text-align:center;display:block;margin-bottom:6px;">
+                                <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">15 kW</span>
+                            </label>
+                            <input type="number" id="cost_15kw" step="1000" min="10000" max="999999"
+                                   value="{{ settings.system_costs.get('15', 350000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label for="cost_20kw" style="text-align:center;display:block;margin-bottom:6px;">
+                                <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">20 kW</span>
+                            </label>
+                            <input type="number" id="cost_20kw" step="1000" min="10000" max="999999"
+                                   value="{{ settings.system_costs.get('20', 440000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;">
+                        <button onclick="saveSettings()" class="btn btn-primary" id="save-btn" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; color: #fff;">
+                            <i class="bi bi-check-lg"></i> บันทึกการตั้งค่า
+                        </button>
+                        <button onclick="resetDefaults()" class="btn btn-ghost" style="padding: 10px 18px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.25);">
+                            <i class="bi bi-arrow-counterclockwise"></i> คืนค่าเริ่มต้น
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="col-lg-5">
+            <!-- AI Model Info -->
+            <div class="card mb-3" style="padding: 22px;">
+                <h6 class="card-title mb-4" style="font-size: 16px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-cpu-fill" style="color:#38bdf8;"></i> ข้อมูลโมเดล Machine Learning
+                </h6>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div style="background: rgba(16,185,129,0.1); border-radius: 10px; padding: 14px; text-align: center; border: 1px solid rgba(16,185,129,0.3);">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #34d399; font-weight: 700; margin-bottom: 4px;">R² Score</div>
+                        <div style="font-size: 28px; font-weight: 800; color: #34d399; font-family: 'Inter', sans-serif; line-height: 1;">0.9427</div>
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); border-radius: 10px; padding: 14px; border: 1px solid rgba(148,163,184,0.15);">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; font-weight: 700; margin-bottom: 6px;">Error Metrics</div>
+                        <div style="font-size: 12px; color: #94a3b8;">RMSE: <strong style="color: #f8fafc;">2.52</strong></div>
+                        <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">MAE: <strong style="color: #f8fafc;">1.81</strong></div>
+                    </div>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:8px; font-size: 12.5px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 6px;">
+                        <span style="color: #94a3b8;">อัลกอริทึม</span>
+                        <strong style="color: #f8fafc;">Random Forest Regressor (Pipeline)</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 6px;">
+                        <span style="color: #94a3b8;">Decision Trees</span>
+                        <strong style="color: #38bdf8;">500 Estimators</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(148,163,184,0.1); padding-bottom: 6px;">
+                        <span style="color: #94a3b8;">พื้นที่ศึกษาเฉพาะ</span>
+                        <strong style="color: #34d399;">อ.บ้านโป่ง จ.ราชบุรี (384 Records)</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #94a3b8;">ไฟล์โมเดล</span>
+                        <code style="color: #38bdf8;">solar_model_final_365days.pkl</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function saveSettings() {
+    const rate = parseFloat(document.getElementById('electricity_rate').value);
+    const buyback = parseFloat(document.getElementById('pea_buyback_rate').value);
+    const daytime = parseFloat(document.getElementById('daytime_ratio').value);
+
+    // Validate
+    if (!rate || rate <= 0 || rate > 20) { Toast.show('อัตราค่าไฟฟ้าไม่ถูกต้อง (1–20 บาท/kWh)', 'error'); return; }
+    if (buyback < 0 || buyback > 10) { Toast.show('อัตรารับซื้อไฟคืนไม่ถูกต้อง (0–10 บาท/kWh)', 'error'); return; }
+    if (daytime < 0.1 || daytime > 1.0) { Toast.show('สัดส่วนกลางวันต้องอยู่ระหว่าง 0.10 – 1.00', 'error'); return; }
+
+    const c3 = parseInt(document.getElementById('cost_3kw').value);
+    const c5 = parseInt(document.getElementById('cost_5kw').value);
+    const c10 = parseInt(document.getElementById('cost_10kw').value);
+    const c15 = parseInt(document.getElementById('cost_15kw').value);
+    const c20 = parseInt(document.getElementById('cost_20kw').value);
+
+    const payload = {
+        electricity_rate: rate,
+        pea_buyback_rate: buyback,
+        daytime_ratio: daytime,
+        system_costs: {
+            '3': c3,
+            '5': c5,
+            '10': c10,
+            '15': c15,
+            '20': c20
+        }
+    };
+
+    const btn = document.getElementById('save-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> กำลังบันทึก...'; }
+
+    try {
+        const res = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            Toast.show('✅ บันทึกการตั้งค่าระบบเรียบร้อยแล้ว', 'success');
+        } else {
+            const data = await res.json();
+            Toast.show('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่ทราบสาเหตุ'), 'error');
+        }
+    } catch (err) {
+        Toast.show('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้: ' + err.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-check-lg"></i> บันทึกการตั้งค่า'; }
+    }
+}
+
+function resetDefaults() {
+    if (!confirm('ต้องการคืนค่าพารามิเตอร์ทั้งหมดเป็นค่าเริ่มต้นใช่หรือไม่?')) return;
+    document.getElementById('electricity_rate').value = 4.50;
+    document.getElementById('pea_buyback_rate').value = 2.20;
+    document.getElementById('daytime_ratio').value = 0.65;
+    document.getElementById('cost_3kw').value = 95000;
+    document.getElementById('cost_5kw').value = 150000;
+    document.getElementById('cost_10kw').value = 250000;
+    document.getElementById('cost_15kw').value = 350000;
+    document.getElementById('cost_20kw').value = 440000;
+    saveSettings();
+}
+</script>
+{% endblock %}

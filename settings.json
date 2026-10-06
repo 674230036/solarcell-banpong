@@ -1,0 +1,90 @@
+{
+  "electricity_rate": 4.5,
+  "pea_buyback_rate": 2.2,
+  "daytime_ratio": 0.65,
+  "co2_factor": 0.4985,
+  "typical_monthly_usage": 400,
+  "study_area": {
+    "district": "อำเภอบ้านโป่ง",
+    "province": "จังหวัดราชบุรี",
+    "lat": 13.8264,
+    "lng": 99.878,
+    "zoom": 13
+  },
+  "solar_packages": [
+    {
+      "id": "pkg-3kw",
+      "kw": 3,
+      "name": "Solar Rooftop 3 kW (Eco Lite)",
+      "cost": 95000,
+      "inverter": "Huawei SUN2000-3KTL / Sungrow SG3.0RS (1 Phase)",
+      "panels": "Tier-1 Mono Half-Cell 585W (5-6 แผง)",
+      "warranty_inverter": "10 ปี",
+      "warranty_panel": "25 ปี (Linear Performance)",
+      "recommended_bill_range": "1,500 – 3,500 บาท/เดือน",
+      "description": "เหมาะสำหรับบ้านพักอาศัยขนาดเล็ก แอร์ 1-2 ตัว ใช้งานกลางวัน",
+      "is_active": true
+    },
+    {
+      "id": "pkg-5kw",
+      "kw": 5,
+      "name": "Solar Rooftop 5 kW (Standard Popular)",
+      "cost": 150000,
+      "inverter": "Huawei SUN2000-5KTL / Sungrow SG5.0RS (1/3 Phase)",
+      "panels": "Tier-1 Mono Half-Cell 585W (9 แผง)",
+      "warranty_inverter": "10 ปี",
+      "warranty_panel": "25 ปี (Linear Performance)",
+      "recommended_bill_range": "3,800 – 7,500 บาท/เดือน",
+      "description": "รุ่นยอดนิยมสำหรับบ้านเดี่ยว แอร์ 2-4 ตัว ประหยัดสูงสุด",
+      "is_active": true
+    },
+    {
+      "id": "pkg-10kw",
+      "kw": 10,
+      "name": "Solar Rooftop 10 kW (Premium Pro)",
+      "cost": 250000,
+      "inverter": "Huawei SUN2000-10KTL / Sungrow SG10RT (3 Phase)",
+      "panels": "Tier-1 Mono Half-Cell 585W (18 แผง)",
+      "warranty_inverter": "10 ปี",
+      "warranty_panel": "25 ปี (Linear Performance)",
+      "recommended_bill_range": "7,500 – 13,000 บาท/เดือน",
+      "description": "สำหรับบ้านหลังใหญ่ โฮมออฟฟิศ แอร์ 4-6 ตัว หรือมี EV Charger",
+      "is_active": true
+    },
+    {
+      "id": "pkg-15kw",
+      "kw": 15,
+      "name": "Solar Rooftop 15 kW (Commercial Max)",
+      "cost": 350000,
+      "inverter": "Huawei SUN2000-15KTL-M2 (3 Phase)",
+      "panels": "Tier-1 Mono Half-Cell 585W (26 แผง)",
+      "warranty_inverter": "10 ปี",
+      "warranty_panel": "25 ปี (Linear Performance)",
+      "recommended_bill_range": "13,000 – 18,000 บาท/เดือน",
+      "description": "สำหรับธุรกิจขนาดกลาง สำนักงาน คลินิก ร้านกาแฟ ใช้งานไฟฟ้าต่อเนื่อง",
+      "is_active": true
+    },
+    {
+      "id": "pkg-20kw",
+      "kw": 20,
+      "name": "Solar Rooftop 20 kW (Enterprise Ultra)",
+      "cost": 440000,
+      "inverter": "Huawei SUN2000-20KTL-M2 / Sungrow SG20RT (3 Phase)",
+      "panels": "Tier-1 Mono Half-Cell 585W (35 แผง)",
+      "warranty_inverter": "10 ปี",
+      "warranty_panel": "25 ปี (Linear Performance)",
+      "recommended_bill_range": "18,000 – 30,000+ บาท/เดือน",
+      "description": "สำหรับอาคารพาณิชย์ โรงงานขนาดย่อม โรงแรม หอพัก ใช้ไฟช่วงกลางวันสูง",
+      "is_active": true
+    }
+  ],
+  "system_costs": {
+    "3": 95000,
+    "5": 150000,
+    "10": 250000,
+    "15": 350000,
+    "20": 440000
+  },
+  "admin_user": "admin",
+  "admin_pass": "solarai2026"
+}

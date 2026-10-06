@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+{% block title %}ผู้ดูแลระบบ – Admin Executive Dashboard{% endblock %}
+{% block page_id %}admin_dashboard{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- Header -->
+    <div class="page-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 20px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); color: #38bdf8; font-size: 11.5px; font-weight: 700; margin-bottom: 8px;">
+                <i class="bi bi-shield-lock-fill"></i> แผงควบคุมผู้ดูแลระบบ (Admin Control Center)
+            </div>
+            <h1 style="font-size: 26px; font-weight: 800; color: #f8fafc; margin: 0 0 4px 0;">ระบบวิเคราะห์และตรวจสอบภาพรวม</h1>
+            <p style="color: #94a3b8; font-size: 13.5px; margin: 0;">ตรวจสอบสถานะการทำงานของโมเดล AI, ประวัติการคำนวณของผู้ใช้งาน, และจัดการพารามิเตอร์ระบบ</p>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('admin_packages') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #0284c7, #0d9488); border: none; font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; color: #fff; text-decoration: none;">
+                <i class="bi bi-box-seam-fill"></i> จัดการแพ็กเกจโซลาร์
+            </a>
+            <a href="{{ url_for('api_export_excel', analysis_id='all') }}" class="btn btn-ghost" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+                <i class="bi bi-file-earmark-excel-fill"></i> ส่งออก Audit Excel ทั้งหมด
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Statistics Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <!-- KPI 1: Total Runs -->
+        <div class="card" style="padding: 18px; border-left: 4px solid #38bdf8;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">การวิเคราะห์ทั้งหมด</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Inter', sans-serif; color: #f8fafc; line-height: 1;">{{ total_runs }}</div>
+                    <div style="font-size: 11px; color: #38bdf8; margin-top: 6px;">
+                        <i class="bi bi-activity"></i> บันทึกในระบบ DSS
+                    </div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 20px;">
+                    <i class="bi bi-cpu"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI 2: Total Energy Generated -->
+        <div class="card" style="padding: 18px; border-left: 4px solid #10b981;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">พลังงานประเมินรวม</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Inter', sans-serif; color: #34d399; line-height: 1;">{{ total_energy_mwh }} <span style="font-size: 14px; font-weight: 600;">MWh/ปี</span></div>
+                    <div style="font-size: 11px; color: #34d399; margin-top: 6px;">
+                        <i class="bi bi-sun-fill"></i> ศักยภาพแสงแดดบ้านโป่ง
+                    </div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 20px;">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI 3: Total Estimated Savings -->
+        <div class="card" style="padding: 18px; border-left: 4px solid #f59e0b;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">มูลค่าประหยัดค่าไฟรวม</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Inter', sans-serif; color: #fbbf24; line-height: 1;">฿{{ "{:,}".format(total_savings_thb) }}</div>
+                    <div style="font-size: 11px; color: #fbbf24; margin-top: 6px;">
+                        <i class="bi bi-cash-stack"></i> บาท / ปี (คำนวณสะสม)
+                    </div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(245, 158, 11, 0.15); display: flex; align-items: center; justify-content: center; color: #f59e0b; font-size: 20px;">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI 4: Carbon Offset -->
+        <div class="card" style="padding: 18px; border-left: 4px solid #06b6d4;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <div style="font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px;">ลดการปล่อยก๊าซ CO₂</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Inter', sans-serif; color: #22d3ee; line-height: 1;">{{ total_co2_tons }} <span style="font-size: 14px; font-weight: 600;">ตัน/ปี</span></div>
+                    <div style="font-size: 11px; color: #22d3ee; margin-top: 6px;">
+                        <i class="bi bi-tree-fill"></i> ลดภาวะโลกร้อน
+                    </div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(6, 182, 212, 0.15); display: flex; align-items: center; justify-content: center; color: #06b6d4; font-size: 20px;">
+                    <i class="bi bi-globe-americas"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Middle Section: AI Diagnostics & Package Distribution -->
+    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 24px;" class="admin-grid-charts">
+        <!-- AI Model Status & Feature Weights -->
+        <div class="card" style="padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-cpu-fill" style="color: #38bdf8;"></i> ประสิทธิภาพและสถานะโมเดล AI
+                </h3>
+                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 11px; font-weight: 700;">
+                    <span class="pulse-dot"></span> {{ model_info.status }}
+                </span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px;">
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.15); text-align: center;">
+                    <div style="font-size: 10.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">R² Score</div>
+                    <div style="font-size: 22px; font-weight: 800; color: #34d399; font-family: 'Inter', sans-serif;">{{ model_info.r2 }}</div>
+                    <div style="font-size: 10px; color: #64748b;">ความแม่นยำสูง (>94%)</div>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.15); text-align: center;">
+                    <div style="font-size: 10.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">RMSE Error</div>
+                    <div style="font-size: 22px; font-weight: 800; color: #38bdf8; font-family: 'Inter', sans-serif;">{{ model_info.rmse }}</div>
+                    <div style="font-size: 10px; color: #64748b;">kWh / วัน</div>
+                </div>
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(148, 163, 184, 0.15); text-align: center;">
+                    <div style="font-size: 10.5px; color: #94a3b8; font-weight: 600; text-transform: uppercase;">MAE Error</div>
+                    <div style="font-size: 22px; font-weight: 800; color: #fbbf24; font-family: 'Inter', sans-serif;">{{ model_info.mae }}</div>
+                    <div style="font-size: 10px; color: #64748b;">kWh / วัน</div>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase;">
+                ความสำคัญของตัวแปร (Feature Importances)
+            </div>
+            <div style="max-height: 180px; overflow-y: auto;">
+                <canvas id="featureImportanceChart" height="150"></canvas>
+            </div>
+        </div>
+
+        <!-- Solar Package Distribution -->
+        <div class="card" style="padding: 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-pie-chart-fill" style="color: #fbbf24;"></i> สัดส่วนขนาดระบบที่แนะนำ (kW)
+                </h3>
+            </div>
+            <div style="height: 220px; display: flex; align-items: center; justify-content: center;">
+                <canvas id="packageDistributionChart"></canvas>
+            </div>
+        </div>
+    <!-- Live Calculation Simulation & Formula Verification Bench -->
+    <div class="card mb-4" style="padding: 22px; border: 1.5px solid rgba(56, 189, 248, 0.3); background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(11,19,41,0.95) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-calculator-fill" style="color: #38bdf8;"></i> เครื่องมือจำลองและทดสอบสูตรคำนวณสด (Admin Calculation Test Bench)
+                </h3>
+                <p style="font-size: 12px; color: #94a3b8; margin: 3px 0 0 0;">ทดสอบจำลองพารามิเตอร์ ค่าไฟ และพิกัดตำบล เพื่อตรวจสอบความถูกต้องของสูตรคำนวณและเกณฑ์ PEA</p>
+            </div>
+            <span style="font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(56,189,248,0.15); color: #38bdf8; font-weight: 600;">
+                <i class="bi bi-shield-check"></i> Mathematical Verification
+            </span>
+        </div>
+
+        <!-- Simulation Input Form -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 16px;">
+            <div>
+                <label style="font-size: 12px; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">ตำบลที่ทดสอบ (อ.บ้านโป่ง):</label>
+                <select id="sim-tambon" style="width: 100%; background: #1e293b; border: 1px solid rgba(148,163,184,0.3); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 12.5px;">
+                    <option value="13.8160,99.8770">ต.บ้านโป่ง (13.8160°N, 99.8770°E)</option>
+                    <option value="13.8050,99.8520">ต.ท่าผา (13.8050°N, 99.8520°E)</option>
+                    <option value="13.8340,99.8650">ต.เบิกไพร (13.8340°N, 99.8650°E)</option>
+                    <option value="13.8450,99.9210">ต.หนองกบ (13.8450°N, 99.9210°E)</option>
+                    <option value="13.9120,99.8820">ต.กรับใหญ่ (13.9120°N, 99.8820°E)</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size: 12px; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">ค่าไฟฟ้าต่อเดือนที่ทดสอบ (บาท):</label>
+                <input type="number" id="sim-bill" value="5000" step="500" min="500" max="200000" style="width: 100%; background: #1e293b; border: 1px solid rgba(148,163,184,0.3); color: #fff; padding: 8px 10px; border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif;">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+                <button type="button" onclick="runAdminSimulation()" class="btn btn-primary" style="width: 100%; padding: 8px 14px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #0284c7, #10b981); border: none; border-radius: 8px; color: white;">
+                    <i class="bi bi-play-fill"></i> ประมวลผลและตรวจสอบสูตร
+                </button>
+            </div>
+        </div>
+
+        <!-- Simulation Results Box -->
+        <div id="sim-result-box" style="display: none; background: rgba(0,0,0,0.3); border: 1px solid rgba(52,211,153,0.25); border-radius: 10px; padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                <div style="font-size: 13px; font-weight: 700; color: #34d399;" id="sim-rec-title">
+                    <i class="bi bi-check-circle-fill"></i> ระบบที่แนะนำ: 5 kW
+                </div>
+                <div style="font-size: 11.5px; color: #94a3b8;" id="sim-formula-note">
+                    อิงเกณฑ์ PEA 4.50 บาท/หน่วย | ขายคืน 2.20 บาท
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center;">
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 10.5px; color: #94a3b8;">ผลิตรายวัน</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #f8fafc; font-family: 'Inter';" id="sim-daily">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 10.5px; color: #94a3b8;">ผลิตรายปี</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #38bdf8; font-family: 'Inter';" id="sim-annual">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 10.5px; color: #94a3b8;">ประหยัด/เดือน</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #34d399; font-family: 'Inter';" id="sim-save-month">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 10.5px; color: #94a3b8;">ประหยัด/ปี</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #fbbf24; font-family: 'Inter';" id="sim-save-year">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 10.5px; color: #94a3b8;">ROI / ปี</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #a855f7; font-family: 'Inter';" id="sim-roi">-</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+                    <div style="font-size: 10.5px; color: #94a3b8;">ระยะเวลาคืนทุน</div>
+                    <div style="font-size: 16px; font-weight: 800; color: #38bdf8; font-family: 'Inter';" id="sim-payback">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prediction History & Audit Trail -->
+    <div class="card" style="padding: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="bi bi-journal-text" style="color: #38bdf8;"></i> รายการบันทึกการประมวลผลและการวิเคราะห์ล่าสุด (Audit Trail)
+                </h3>
+                <p style="font-size: 12px; color: #94a3b8; margin: 4px 0 0 0;">รายการที่ผู้ใช้งานทดสอบคำนวณและบันทึกลงในระบบ DSS</p>
+            </div>
+            <a href="{{ url_for('admin_audit') }}" class="btn btn-ghost" style="font-size: 12px; padding: 6px 12px; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; text-decoration: none;">
+                ดูทั้งหมด <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.2); color: #94a3b8; text-align: left;">
+                        <th style="padding: 10px 12px;">ID</th>
+                        <th style="padding: 10px 12px;">สถานที่ / พิกัด</th>
+                        <th style="padding: 10px 12px;">วันที่ & เวลา</th>
+                        <th style="padding: 10px 12px;">ค่าไฟรายเดือน</th>
+                        <th style="padding: 10px 12px; text-align: center;">ขนาดแนะนำ</th>
+                        <th style="padding: 10px 12px; text-align: right;">ผลิต/ปี (kWh)</th>
+                        <th style="padding: 10px 12px; text-align: right;">ประหยัด/ปี</th>
+                        <th style="padding: 10px 12px; text-align: center;">คืนทุน</th>
+                        <th style="padding: 10px 12px; text-align: center;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if history %}
+                        {% for r in history[:10] %}
+                        <tr style="border-bottom: 1px solid rgba(148, 163, 184, 0.08); color: #e2e8f0;">
+                            <td style="padding: 12px;"><code style="color: #38bdf8;">{{ r.id }}</code></td>
+                            <td style="padding: 12px; font-weight: 500;">
+                                <i class="bi bi-geo-alt text-green"></i> {{ r.address }}
+                            </td>
+                            <td style="padding: 12px; color: #94a3b8;">{{ r.analyzed_date }} {{ r.analyzed_time }}</td>
+                            <td style="padding: 12px;">฿{{ "{:,}".format(r.monthly_bill or 0) }}</td>
+                            <td style="padding: 12px; text-align: center;">
+                                <span style="padding: 3px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 700; font-size: 11.5px;">
+                                    {{ r.recommended.kw if r.recommended else 5 }} kW
+                                </span>
+                            </td>
+                            <td style="padding: 12px; text-align: right; font-family: 'Inter', sans-serif;">{{ "{:,.1f}".format(r.annual_kwh or 0) }}</td>
+                            <td style="padding: 12px; text-align: right; color: #34d399; font-weight: 600;">฿{{ "{:,}".format(r.annual_save or 0) }}</td>
+                            <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: 600;">{{ r.breakeven }} ปี</td>
+                            <td style="padding: 12px; text-align: center;">
+                                <a href="{{ url_for('analysis_detail', analysis_id=r.id) }}" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 4px;" title="ดูผลวิเคราะห์">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url_for('api_export_excel', analysis_id=r.id) }}" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 4px; color: #10b981;" title="ดาวน์โหลด Excel">
+                                    <i class="bi bi-file-earmark-excel"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 32px; color: #94a3b8;">
+                                <i class="bi bi-inbox" style="font-size: 28px; display: block; margin-bottom: 8px;"></i>
+                                ยังไม่มีข้อมูลการวิเคราะห์ในระบบ
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Feature Importance Chart
+    const featCtx = document.getElementById('featureImportanceChart');
+    if (featCtx) {
+        const features = {{ model_info.features | tojson }};
+        const importances = {{ model_info.importances | tojson }};
+        
+        new Chart(featCtx, {
+            type: 'bar',
+            data: {
+                labels: features,
+                datasets: [{
+                    label: 'Weight',
+                    data: importances,
+                    backgroundColor: 'rgba(56, 189, 248, 0.7)',
+                    borderColor: '#38bdf8',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(c) { return ' Importance: ' + (c.raw * 100).toFixed(2) + '%'; }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#cbd5e1', font: { size: 10 } }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Solar Package Distribution Chart
+    const pkgCtx = document.getElementById('packageDistributionChart');
+    if (pkgCtx) {
+        const pkgCounts = {{ package_counts | tojson }};
+        const labels = Object.keys(pkgCounts).map(k => k + ' kW');
+        const dataVals = Object.values(pkgCounts);
+        
+        new Chart(pkgCtx, {
+            type: 'doughnut',
+            data: {
+                labels: labels.length > 0 ? labels : ['3 kW', '5 kW', '10 kW', '15 kW', '20 kW'],
+                datasets: [{
+                    data: dataVals.length > 0 ? dataVals : [1, 3, 2, 1, 1],
+                    backgroundColor: [
+                        '#38bdf8',
+                        '#10b981',
+                        '#f59e0b',
+                        '#8b5cf6',
+                        '#ec4899'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#0f172a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { color: '#e2e8f0', font: { size: 11, family: 'Inter' } }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+});
+
+async function runAdminSimulation() {
+    const tambonVal = document.getElementById('sim-tambon').value;
+    const billVal = parseFloat(document.getElementById('sim-bill').value) || 5000;
+    const parts = tambonVal.split(',');
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+
+    try {
+        const res = await fetch('/api/admin/simulate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lat, lng, monthly_bill: billVal })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            const sim = data.simulation;
+            document.getElementById('sim-rec-title').innerHTML = `<i class="bi bi-check-circle-fill"></i> ระบบที่แนะนำ: <strong>${sim.recommended.kw} kW</strong> (${sim.suitability_label} / ความเชื่อมั่น ${sim.confidence}%)`;
+            document.getElementById('sim-formula-note').innerText = `ค่าไฟทดสอบ ฿${billVal.toLocaleString()} | ประหยัดสุทธิ ${((sim.annual_save / (billVal*12))*100).toFixed(1)}%`;
+            document.getElementById('sim-daily').innerText = `${sim.current_daily} kWh`;
+            document.getElementById('sim-annual').innerText = `${sim.annual_kwh.toLocaleString()} kWh`;
+            document.getElementById('sim-save-month').innerText = `฿${sim.monthly_save.toLocaleString()}`;
+            document.getElementById('sim-save-year').innerText = `฿${sim.annual_save.toLocaleString()}`;
+            document.getElementById('sim-roi').innerText = `${sim.roi}%`;
+            document.getElementById('sim-payback').innerText = `${sim.breakeven} ปี`;
+            document.getElementById('sim-result-box').style.display = 'block';
+        }
+    } catch (e) {
+        alert('Simulation failed: ' + e.message);
+    }
+}
+</script>
+{% endblock %}

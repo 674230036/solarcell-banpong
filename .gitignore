@@ -1,0 +1,22 @@
+# Documentation / Presentation files
+PROJECT_DOCUMENTATION.html
+
+# Python cache & environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Temp & testing files
+test_*.py
+test_*.xlsx
+test03.ipynb
+project2/
+*.bat
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db

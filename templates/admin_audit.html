@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% block title %}ตรวจสอบการคำนวณและประวัติ – Admin Audit Trail{% endblock %}
+{% block page_id %}admin_audit{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+    <!-- Header -->
+    <div class="page-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 20px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); color: #38bdf8; font-size: 11.5px; font-weight: 700; margin-bottom: 8px;">
+                <i class="bi bi-journal-check"></i> บันทึกการทำงานระบบ (Prediction Audit Trail)
+            </div>
+            <h1 style="font-size: 26px; font-weight: 800; color: #f8fafc; margin: 0 0 4px 0;">ตรวจสอบประวัติการพยากรณ์และการเงิน</h1>
+            <p style="color: #94a3b8; font-size: 13.5px; margin: 0;">ตรวจสอบรายละเอียดเชิงลึกของทุกการประมวลผลโมเดล AI และการวิเคราะห์จุดคุ้มทุน</p>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('api_export_excel', analysis_id='all') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #059669, #0d9488); border: none; font-weight: 600; font-size: 13px; padding: 9px 16px; border-radius: 8px; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="bi bi-file-earmark-excel-fill"></i> ดาวน์โหลด Audit Excel
+            </a>
+            {% if history %}
+            <button onclick="clearAllAudit()" class="btn btn-ghost" style="color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); font-size: 13px; font-weight: 600; padding: 9px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="bi bi-trash3-fill"></i> ล้างประวัติทั้งหมด
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card mb-4" style="padding: 16px 20px;">
+        <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 220px; position: relative;">
+                <i class="bi bi-search" style="position: absolute; left: 12px; top: 11px; color: #94a3b8; font-size: 14px;"></i>
+                <input type="text" id="searchInput" onkeyup="filterAuditTable()" placeholder="ค้นหาตามสถานที่, พิกัด GPS หรือ ID..."
+                       style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); color: #fff; padding: 9px 12px 9px 36px; border-radius: 8px; width: 100%; font-size: 13px;">
+            </div>
+
+            <div style="min-width: 150px;">
+                <select id="filterKw" onchange="filterAuditTable()" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); color: #cbd5e1; padding: 9px 12px; border-radius: 8px; width: 100%; font-size: 13px;">
+                    <option value="">ทุกขนาดระบบ (kW)</option>
+                    <option value="3 kW">3 kW</option>
+                    <option value="5 kW">5 kW</option>
+                    <option value="10 kW">10 kW</option>
+                    <option value="15 kW">15 kW</option>
+                    <option value="20 kW">20 kW</option>
+                </select>
+            </div>
+
+            <div style="min-width: 150px;">
+                <select id="filterSuitability" onchange="filterAuditTable()" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.2); color: #cbd5e1; padding: 9px 12px; border-radius: 8px; width: 100%; font-size: 13px;">
+                    <option value="">ทุกระดับความเหมาะสม</option>
+                    <option value="5 ดาว">5 ดาว (เหมาะสมมาก)</option>
+                    <option value="4 ดาว">4 ดาว (เหมาะสม)</option>
+                    <option value="3 ดาว">3 ดาว (ปานกลาง)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Table Card -->
+    <div class="card" style="padding: 20px;">
+        <div style="overflow-x: auto;">
+            <table class="table" id="auditTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(148, 163, 184, 0.2); color: #94a3b8; text-align: left;">
+                        <th style="padding: 12px;">ID</th>
+                        <th style="padding: 12px;">สถานที่ / พิกัด</th>
+                        <th style="padding: 12px;">วัน-เวลา</th>
+                        <th style="padding: 12px; text-align: right;">ค่าไฟ (บาท)</th>
+                        <th style="padding: 12px; text-align: center;">ขนาดแนะนำ</th>
+                        <th style="padding: 12px; text-align: right;">ผลิต/วัน</th>
+                        <th style="padding: 12px; text-align: right;">ผลิต/ปี</th>
+                        <th style="padding: 12px; text-align: right;">ประหยัด/ปี</th>
+                        <th style="padding: 12px; text-align: center;">ROI (%)</th>
+                        <th style="padding: 12px; text-align: center;">คืนทุน</th>
+                        <th style="padding: 12px; text-align: center;">การดำเนินการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if history %}
+                        {% for r in history %}
+                        <tr class="audit-row" style="border-bottom: 1px solid rgba(148, 163, 184, 0.08); color: #e2e8f0;">
+                            <td style="padding: 12px;"><code style="color: #38bdf8;">{{ r.id }}</code></td>
+                            <td style="padding: 12px;">
+                                <div style="font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
+                                    <i class="bi bi-geo-alt-fill text-green"></i> {{ r.address }}
+                                </div>
+                                <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">
+                                    {{ r.lat }}°N, {{ r.lng }}°E
+                                </div>
+                            </td>
+                            <td style="padding: 12px; color: #94a3b8; font-size: 12px;">
+                                {{ r.analyzed_date }}<br><small>{{ r.analyzed_time }}</small>
+                            </td>
+                            <td style="padding: 12px; text-align: right; font-family: 'Inter', sans-serif;">
+                                ฿{{ "{:,}".format(r.monthly_bill or 0) }}
+                            </td>
+                            <td style="padding: 12px; text-align: center;" class="kw-cell">
+                                <span style="padding: 3px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 700; font-size: 12px;">
+                                    {{ r.recommended.kw if r.recommended else 5 }} kW
+                                </span>
+                            </td>
+                            <td style="padding: 12px; text-align: right; font-family: 'Inter', sans-serif;">
+                                {{ "{:,.2f}".format(r.current_daily or 0) }}
+                            </td>
+                            <td style="padding: 12px; text-align: right; font-family: 'Inter', sans-serif;">
+                                {{ "{:,.1f}".format(r.annual_kwh or 0) }}
+                            </td>
+                            <td style="padding: 12px; text-align: right; color: #34d399; font-weight: 700; font-family: 'Inter', sans-serif;">
+                                ฿{{ "{:,}".format(r.annual_save or 0) }}
+                            </td>
+                            <td style="padding: 12px; text-align: center; font-family: 'Inter', sans-serif; color: #38bdf8; font-weight: 700;">
+                                {{ r.roi }}%
+                            </td>
+                            <td style="padding: 12px; text-align: center; color: #fbbf24; font-weight: 700;">
+                                {{ r.breakeven }} ปี
+                            </td>
+                            <td style="padding: 12px; text-align: center;">
+                                <div style="display: flex; gap: 6px; justify-content: center;">
+                                    <button onclick='inspectRecord({{ r | tojson }})' class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 4px; color: #38bdf8;" title="ดู JSON และพารามิเตอร์">
+                                        <i class="bi bi-code-slash"></i>
+                                    </button>
+                                    <a href="{{ url_for('analysis_detail', analysis_id=r.id) }}" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 4px;" title="เปิดหน้ารายงาน">
+                                        <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                    <button onclick="deleteRecord('{{ r.id }}')" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 4px; color: #f87171;" title="ลบรายการนี้">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="11" style="text-align: center; padding: 40px; color: #94a3b8;">
+                                <i class="bi bi-folder2-open" style="font-size: 32px; display: block; margin-bottom: 10px;"></i>
+                                ยังไม่มีข้อมูลการวิเคราะห์ในระบบ
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: JSON Inspector -->
+<div id="inspectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+    <div class="card" style="width: 100%; max-width: 720px; max-height: 85vh; display: flex; flex-direction: column; padding: 24px; border: 1px solid rgba(56, 189, 248, 0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 id="inspectorTitle" style="font-size: 17px; font-weight: 800; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i class="bi bi-braces" style="color: #38bdf8;"></i> รายละเอียดข้อมูลการคำนวณ (JSON Payload)
+            </h3>
+            <button onclick="closeInspector()" style="background: none; border: none; font-size: 22px; color: #94a3b8; cursor: pointer;">&times;</button>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; background: #090d16; border-radius: 8px; padding: 16px; border: 1px solid rgba(148, 163, 184, 0.15);">
+            <pre id="inspectorContent" style="margin: 0; font-family: 'Courier New', monospace; font-size: 12px; color: #34d399; line-height: 1.5; white-space: pre-wrap; word-break: break-all;"></pre>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+            <button onclick="closeInspector()" class="btn btn-primary" style="padding: 8px 18px; border-radius: 6px;">ปิดหน้าต่าง</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterAuditTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const kwFilter = document.getElementById('filterKw').value;
+    const rows = document.querySelectorAll('.audit-row');
+
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        const kwCell = row.querySelector('.kw-cell')?.innerText || '';
+        
+        const matchSearch = text.includes(search);
+        const matchKw = !kwFilter || kwCell.includes(kwFilter);
+
+        if (matchSearch && matchKw) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function inspectRecord(record) {
+    document.getElementById('inspectorTitle').innerHTML = '<i class="bi bi-braces" style="color: #38bdf8;"></i> ข้อมูลการคำนวณ ID: <span style="color:#38bdf8;">' + record.id + '</span>';
+    document.getElementById('inspectorContent').textContent = JSON.stringify(record, null, 2);
+    document.getElementById('inspectorModal').style.display = 'flex';
+}
+
+function closeInspector() {
+    document.getElementById('inspectorModal').style.display = 'none';
+}
+
+async function deleteRecord(recordId) {
+    if (!confirm(`คุณต้องการลบรายการ ID ${recordId} ใช่หรือไม่?`)) return;
+
+    try {
+        const res = await fetch('/api/history/' + encodeURIComponent(recordId), {
+            method: 'DELETE'
+        });
+        if (res.ok) {
+            showToast('ลบรายการสำเร็จ', 'success');
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            showToast('เกิดข้อผิดพลาดในการลบ', 'error');
+        }
+    } catch (err) {
+        showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+    }
+}
+
+async function clearAllAudit() {
+    if (!confirm('คำเตือน: คุณต้องการล้างประวัติการวิเคราะห์ทั้งหมดในระบบใช่หรือไม่? ข้อมูลทั้งหมดจะถูกลบถาวร')) return;
+
+    try {
+        const res = await fetch('/api/admin/audit/clear', {
+            method: 'POST'
+        });
+        if (res.ok) {
+            showToast('ล้างประวัติทั้งหมดเรียบร้อยแล้ว', 'success');
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            showToast('เกิดข้อผิดพลาดในการล้างประวัติ', 'error');
+        }
+    } catch (err) {
+        showToast('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+    }
+}
+</script>
+{% endblock %}
