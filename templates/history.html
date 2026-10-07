@@ -4,27 +4,26 @@
 
 {% block content %}
 <div class="page-wrapper">
-    <div class="page-header d-flex justify-content-between align-items-center">
-        <div>
+    <div class="page-header history-header">
+        <div class="history-header-text">
             <h1>ประวัติการวิเคราะห์</h1>
             <p>รายการการวิเคราะห์พื้นที่ทั้งหมดพร้อมดาวน์โหลด Excel</p>
         </div>
-        <div class="d-flex gap-2">
-            <div style="position:relative;">
-                <i class="bi bi-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;pointer-events:none;"></i>
-                <input type="text" id="search-filter" placeholder="ค้นหาสถานที่..."
-                       style="border:1.5px solid var(--border-dark);border-radius:var(--radius-sm);padding:9px 12px 9px 36px;font-family:var(--font);font-size:13px;outline:none;width:220px;transition:border-color .18s;background:var(--surface);"
-                       onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-dark)'">
+        <div class="history-header-controls">
+            <div class="history-search-wrap">
+                <i class="bi bi-search history-search-icon"></i>
+                <input type="text" id="search-filter" class="history-search-input" placeholder="ค้นหาสถานที่...">
             </div>
-            <a href="{{ url_for('gis_map') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> วิเคราะห์ใหม่
+            <a href="{{ url_for('gis_map') }}" class="btn btn-primary history-new-btn">
+                <i class="bi bi-plus-lg"></i> <span>วิเคราะห์ใหม่</span>
             </a>
         </div>
     </div>
 
-    <div class="card">
+    <!-- Container for Desktop Table (≥ 769px) -->
+    <div class="card history-desktop-card">
         <div class="card-body p-0">
-            <div style="overflow-x:auto;">
+            <div class="table-responsive">
                 <table class="data-table" id="history-table">
                     <thead>
                         <tr>
@@ -36,7 +35,7 @@
                             <th>ประหยัด/ปี</th>
                             <th>ROI</th>
                             <th>คืนทุน</th>
-                            <th style="width:140px;"></th>
+                            <th style="width:140px;">การจัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="history-tbody">
@@ -51,6 +50,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Container for Mobile / iPad Portrait Cards (≤ 768px) -->
+    <div id="history-mobile-cards" class="history-mobile-container">
+        <!-- Rendered by JS -->
+    </div>
 </div>
 {% endblock %}
 
@@ -59,74 +63,140 @@
 let allHistory = [];
 
 function renderStarsInline(n, max = 5) {
-    return '★'.repeat(n) + '<span style="color:#e2e8f0;">★</span>'.repeat(max - n);
+    return '★'.repeat(n) + '<span style="color:#e2e8f0;opacity:0.3;">★</span>'.repeat(Math.max(0, max - n));
 }
 
 async function loadHistory() {
     try {
         const data = await fetch('/api/history').then(r => r.json());
         allHistory = data;
-        renderTable(data);
+        renderData(data);
     } catch (e) {
-        document.getElementById('history-tbody').innerHTML =
-            '<tr><td colspan="9" style="text-align:center;color:var(--red);padding:32px;"><i class="bi bi-exclamation-triangle" style="font-size:24px;display:block;margin-bottom:8px;"></i>โหลดข้อมูลไม่สำเร็จ</td></tr>';
+        const errMsg = '<tr><td colspan="9" style="text-align:center;color:var(--red);padding:32px;"><i class="bi bi-exclamation-triangle" style="font-size:24px;display:block;margin-bottom:8px;"></i>โหลดข้อมูลไม่สำเร็จ</td></tr>';
+        const tb = document.getElementById('history-tbody');
+        if (tb) tb.innerHTML = errMsg;
+        const mc = document.getElementById('history-mobile-cards');
+        if (mc) mc.innerHTML = `<div class="card p-4 text-center" style="color:var(--red);"><i class="bi bi-exclamation-triangle fs-3 d-block mb-2"></i>โหลดข้อมูลไม่สำเร็จ</div>`;
     }
 }
 
-function renderTable(data) {
+function renderData(data) {
     const tbody = document.getElementById('history-tbody');
+    const mobileContainer = document.getElementById('history-mobile-cards');
+
     if (!data.length) {
-        tbody.innerHTML = `
-            <tr><td colspan="9">
-                <div class="empty-state">
-                    <i class="bi bi-clock-history"></i>
-                    <h4>ยังไม่มีประวัติการวิเคราะห์</h4>
-                    <p>เริ่มต้นโดยไปที่หน้า GIS Analysis แล้วคลิกบนแผนที่เพื่อวิเคราะห์พื้นที่</p>
-                    <a href="/map" class="btn btn-primary">
-                        <i class="bi bi-map-fill"></i> เปิดแผนที่ GIS
-                    </a>
-                </div>
-            </td></tr>`;
+        const emptyHtml = `
+            <div class="empty-state">
+                <i class="bi bi-clock-history"></i>
+                <h4>ยังไม่มีประวัติการวิเคราะห์</h4>
+                <p>เริ่มต้นโดยไปที่หน้า GIS Analysis แล้วคลิกบนแผนที่เพื่อวิเคราะห์พื้นที่</p>
+                <a href="/map" class="btn btn-primary">
+                    <i class="bi bi-map-fill"></i> เปิดแผนที่ GIS
+                </a>
+            </div>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="9">${emptyHtml}</td></tr>`;
+        if (mobileContainer) mobileContainer.innerHTML = emptyHtml;
         return;
     }
 
-    tbody.innerHTML = data.map(r => `
-        <tr data-id="${r.id}" data-addr="${(r.address||'').toLowerCase()}">
-            <td>
-                <a href="/analysis/${r.id}" style="color:var(--secondary);font-weight:600;max-width:200px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    ${r.address || '–'}
-                </a>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'Inter',sans-serif;">
-                    ${r.lat?.toFixed(4)||''}°N, ${r.lng?.toFixed(4)||''}°E
+    // 1. Render Desktop Table
+    if (tbody) {
+        tbody.innerHTML = data.map(r => `
+            <tr data-id="${r.id}" data-addr="${(r.address||'').toLowerCase()}">
+                <td>
+                    <a href="/analysis/${r.id}" style="color:var(--secondary);font-weight:600;max-width:220px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        ${r.address || '–'}
+                    </a>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'Inter',sans-serif;">
+                        ${r.lat?.toFixed(4)||''}°N, ${r.lng?.toFixed(4)||''}°E
+                    </div>
+                </td>
+                <td style="white-space:nowrap;">
+                    <div style="font-size:13px;font-weight:500;">${r.analyzed_date || '–'}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">${r.analyzed_time || ''}</div>
+                </td>
+                <td>
+                    <span style="color:var(--amber);font-size:14px;">${renderStarsInline(r.suitability || 0)}</span>
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${r.suitability_label || ''}</div>
+                </td>
+                <td style="font-family:'Inter',sans-serif;font-weight:600;">${(r.current_daily || 0).toFixed(1)} kWh</td>
+                <td style="font-family:'Inter',sans-serif;font-weight:600;">${Math.round(r.annual_kwh || 0).toLocaleString()} kWh</td>
+                <td style="color:var(--primary-dark);font-weight:700;font-family:'Inter',sans-serif;">฿${Math.round(r.annual_save || 0).toLocaleString()}</td>
+                <td><span class="badge badge-green" style="font-family:'Inter',sans-serif;">${(r.roi || 0).toFixed(1)}%</span></td>
+                <td style="font-family:'Inter',sans-serif;font-weight:500;">${r.breakeven || '–'} ปี</td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="/analysis/${r.id}" class="btn btn-secondary btn-sm" title="ดูรายละเอียด">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/api/export/excel/${r.id}" class="btn btn-ghost btn-sm" title="ดาวน์โหลด Excel" style="color:var(--primary-dark);border-color:var(--primary-mid);">
+                            <i class="bi bi-file-earmark-excel-fill"></i>
+                        </a>
+                        <button onclick="deleteRecord(${r.id})" class="btn btn-ghost btn-sm" title="ลบ" style="color:var(--red);border-color:var(--red-light);">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`).join('');
+    }
+
+    // 2. Render Mobile App-Style Cards
+    if (mobileContainer) {
+        mobileContainer.innerHTML = data.map(r => `
+            <div class="history-item-card" data-id="${r.id}">
+                <div class="history-item-header">
+                    <div style="flex:1;min-width:0;">
+                        <a href="/analysis/${r.id}" class="history-item-title">
+                            ${r.address || 'บ้านโป่ง, ราชบุรี'}
+                        </a>
+                        <div class="history-item-coords">
+                            <i class="bi bi-geo-alt-fill text-green"></i> ${r.lat?.toFixed(4)||''}°N, ${r.lng?.toFixed(4)||''}°E
+                        </div>
+                    </div>
+                    <div class="history-item-date">
+                        <span>${r.analyzed_date || '–'}</span>
+                        <small>${r.analyzed_time || ''}</small>
+                    </div>
                 </div>
-            </td>
-            <td style="white-space:nowrap;">
-                <div style="font-size:13px;font-weight:500;">${r.analyzed_date || '–'}</div>
-                <div style="font-size:11px;color:var(--text-muted);">${r.analyzed_time || ''}</div>
-            </td>
-            <td>
-                <span style="color:var(--amber);font-size:14px;">${renderStarsInline(r.suitability || 0)}</span>
-                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${r.suitability_label || ''}</div>
-            </td>
-            <td style="font-family:'Inter',sans-serif;font-weight:600;">${(r.current_daily || 0).toFixed(1)} kWh</td>
-            <td style="font-family:'Inter',sans-serif;font-weight:600;">${Math.round(r.annual_kwh || 0).toLocaleString()} kWh</td>
-            <td style="color:var(--primary-dark);font-weight:700;font-family:'Inter',sans-serif;">฿${Math.round(r.annual_save || 0).toLocaleString()}</td>
-            <td><span class="badge badge-green" style="font-family:'Inter',sans-serif;">${(r.roi || 0).toFixed(1)}%</span></td>
-            <td style="font-family:'Inter',sans-serif;font-weight:500;">${r.breakeven || '–'} ปี</td>
-            <td>
-                <div class="d-flex gap-1">
-                    <a href="/analysis/${r.id}" class="btn btn-secondary btn-sm" title="ดูรายละเอียด">
-                        <i class="bi bi-eye"></i>
+
+                <div class="history-item-rating">
+                    <span class="rating-stars">${renderStarsInline(r.suitability || 0)}</span>
+                    <span class="rating-label">${r.suitability_label || 'เหมาะสม'}</span>
+                </div>
+
+                <div class="history-item-stats">
+                    <div class="stat-box">
+                        <span class="stat-lbl">ผลิต / วัน</span>
+                        <strong class="stat-val">${(r.current_daily || 0).toFixed(1)} <small>kWh</small></strong>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-lbl">ผลิต / ปี</span>
+                        <strong class="stat-val">${Math.round(r.annual_kwh || 0).toLocaleString()} <small>kWh</small></strong>
+                    </div>
+                    <div class="stat-box stat-highlight">
+                        <span class="stat-lbl">ประหยัด / ปี</span>
+                        <strong class="stat-val text-green">฿${Math.round(r.annual_save || 0).toLocaleString()}</strong>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-lbl">คืนทุน / ROI</span>
+                        <strong class="stat-val">${r.breakeven || '–'} ปี <small>(${ (r.roi || 0).toFixed(1) }%)</small></strong>
+                    </div>
+                </div>
+
+                <div class="history-item-actions">
+                    <a href="/analysis/${r.id}" class="btn btn-primary btn-sm flex-1">
+                        <i class="bi bi-eye"></i> ดูผลวิเคราะห์
                     </a>
-                    <a href="/api/export/excel/${r.id}" class="btn btn-ghost btn-sm" title="ดาวน์โหลด Excel" style="color:var(--primary-dark);border-color:var(--primary-mid);">
-                        <i class="bi bi-file-earmark-excel-fill"></i>
+                    <a href="/api/export/excel/${r.id}" class="btn btn-ghost btn-sm" style="color:var(--primary-dark);border-color:var(--primary-mid);">
+                        <i class="bi bi-file-earmark-excel-fill"></i> Excel
                     </a>
-                    <button onclick="deleteRecord(${r.id})" class="btn btn-ghost btn-sm" title="ลบ" style="color:var(--red);border-color:var(--red-light);">
+                    <button onclick="deleteRecord(${r.id})" class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red-light);padding:6px 10px;" title="ลบ">
                         <i class="bi bi-trash3"></i>
                     </button>
                 </div>
-            </td>
-        </tr>`).join('');
+            </div>
+        `).join('');
+    }
 }
 
 async function deleteRecord(id) {
@@ -134,7 +204,7 @@ async function deleteRecord(id) {
     try {
         await fetch(`/api/history/${id}`, { method: 'DELETE' });
         allHistory = allHistory.filter(r => r.id !== id);
-        renderTable(allHistory);
+        renderData(allHistory);
         Toast.show('ลบรายการเรียบร้อยแล้ว', 'success');
     } catch (e) {
         Toast.show('ลบไม่สำเร็จ กรุณาลองใหม่', 'error');
@@ -145,7 +215,7 @@ async function deleteRecord(id) {
 document.getElementById('search-filter')?.addEventListener('input', function () {
     const q = this.value.toLowerCase().trim();
     const filtered = q ? allHistory.filter(r => (r.address||'').toLowerCase().includes(q)) : allHistory;
-    renderTable(filtered);
+    renderData(filtered);
 });
 
 loadHistory();

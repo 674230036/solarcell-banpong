@@ -10,7 +10,7 @@
         <a href="{{ url_for('gis_map') }}" style="font-size: 13px; color: #94a3b8; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
             <i class="bi bi-arrow-left"></i> กลับไปแผนที่ GIS บ้านโป่ง
         </a>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="analysis-top-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="/report/document/{{ data.id }}" target="_blank" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 700; font-size: 13px; padding: 9px 18px; border-radius: 8px; color: #fff; box-shadow: 0 4px 14px rgba(16,185,129,0.3); display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
                 <i class="bi bi-file-earmark-pdf-fill"></i> เอกสารสรุปผล / พิมพ์รายงาน
             </a>
@@ -22,8 +22,8 @@
 
     <!-- Hero Assessment Banner -->
     <div class="analysis-hero mb-4" style="background: linear-gradient(135deg, #064e3b 0%, #047857 40%, #0369a1 100%); border-radius: 16px; padding: 26px 30px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); position: relative; overflow: hidden;">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3" style="position:relative; z-index:2;">
-            <div style="max-width: 650px;">
+        <div class="analysis-hero-flex">
+            <div class="analysis-hero-info">
                 <div style="opacity:.85; font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; color: #a7f3d0;">
                     <i class="bi bi-calendar3"></i>
                     {{ data.analyzed_date }} เวลา {{ data.analyzed_time }}
@@ -36,7 +36,7 @@
                 <p style="color: rgba(255,255,255,0.85); font-size: 13.5px; margin: 0 0 14px 0;">
                     พิกัด: <strong>{{ data.lat }}°N, {{ data.lng }}°E</strong> &nbsp;·&nbsp; ความเชื่อมั่นแบบจำลอง AI: <strong style="color: #6ee7b7;">{{ data.confidence }}%</strong>
                 </p>
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
                     <div style="display: flex; gap: 2px;">
                         {% for i in range(data.suitability) %}<span style="font-size:22px; color:#fbbf24;">★</span>{% endfor %}
                         {% for i in range(5 - data.suitability) %}<span style="font-size:22px; opacity:.35; color:white;">★</span>{% endfor %}
@@ -44,6 +44,7 @@
                     <span style="font-size:12.5px; font-weight:700; background:rgba(255,255,255,0.2); backdrop-filter:blur(4px); padding:4px 12px; border-radius:20px; color: #fff; border: 1px solid rgba(255,255,255,0.25);">
                         ระดับความเหมาะสม: {{ data.suitability_label }}
                     </span>
+                </div>
                 {% if data.recommendation_note %}
                 <div class="rec-reason-banner" style="margin-top:10px; display:flex; align-items:center; gap:8px; padding:6px 12px; background:rgba(16,185,129,0.2); border-radius:8px; border:1px solid rgba(52,211,153,0.3); font-size:12px; color:#6ee7b7;">
                     <i class="bi bi-lightbulb-fill" style="color:#fbbf24;"></i> {{ data.recommendation_note }}
@@ -52,22 +53,22 @@
             </div>
 
             <!-- Hero High-Level Cards -->
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; min-width: 280px;">
-                <div style="background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
-                    <div style="font-size: 11px; color: #a7f3d0; text-transform: uppercase; font-weight: 600;">ผลิตไฟฟ้าเฉลี่ย/วัน</div>
-                    <div style="font-size: 24px; font-weight: 800; color: #fff; font-family: 'Inter', sans-serif;">{{ data.current_daily }} <span style="font-size: 13px; font-weight: 600; color: #a7f3d0;">kWh</span></div>
+            <div class="analysis-hero-grid">
+                <div class="hero-mini-card">
+                    <div class="hero-mini-label">ผลิตไฟฟ้าเฉลี่ย/วัน</div>
+                    <div class="hero-mini-val hero-mini-green">{{ data.current_daily }} <span class="hero-mini-unit">kWh</span></div>
                 </div>
-                <div style="background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
-                    <div style="font-size: 11px; color: #a7f3d0; text-transform: uppercase; font-weight: 600;">ผลิตไฟฟ้าเฉลี่ย/ปี</div>
-                    <div style="font-size: 24px; font-weight: 800; color: #fff; font-family: 'Inter', sans-serif;">{{ "{:,.0f}".format(data.annual_kwh) }} <span style="font-size: 13px; font-weight: 600; color: #a7f3d0;">kWh</span></div>
+                <div class="hero-mini-card">
+                    <div class="hero-mini-label">ผลิตไฟฟ้าเฉลี่ย/ปี</div>
+                    <div class="hero-mini-val hero-mini-green">{{ "{:,.0f}".format(data.annual_kwh) }} <span class="hero-mini-unit">kWh</span></div>
                 </div>
-                <div style="background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
-                    <div style="font-size: 11px; color: #fde68a; text-transform: uppercase; font-weight: 600;">ประหยัดค่าไฟ/ปี</div>
-                    <div style="font-size: 24px; font-weight: 800; color: #fbbf24; font-family: 'Inter', sans-serif;">฿{{ "{:,.0f}".format(data.annual_save) }}</div>
+                <div class="hero-mini-card">
+                    <div class="hero-mini-label" style="color:#fde68a;">ประหยัดค่าไฟ/ปี</div>
+                    <div class="hero-mini-val hero-mini-amber">฿{{ "{:,.0f}".format(data.annual_save) }}</div>
                 </div>
-                <div style="background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); padding: 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); text-align: center;">
-                    <div style="font-size: 11px; color: #bae6fd; text-transform: uppercase; font-weight: 600;">ระยะเวลาคืนทุน</div>
-                    <div style="font-size: 24px; font-weight: 800; color: #38bdf8; font-family: 'Inter', sans-serif;">{{ data.breakeven }} <span style="font-size: 13px; font-weight: 600; color: #bae6fd;">ปี</span></div>
+                <div class="hero-mini-card">
+                    <div class="hero-mini-label" style="color:#bae6fd;">ระยะเวลาคืนทุน</div>
+                    <div class="hero-mini-val hero-mini-blue">{{ data.breakeven }} <span class="hero-mini-unit" style="color:#bae6fd;">ปี</span></div>
                 </div>
             </div>
         </div>

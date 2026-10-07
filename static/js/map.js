@@ -37,6 +37,17 @@ function setPanelState(state) {
     panel.classList.remove('open', 'rp-state-input');
     if (state === 'input')   panel.classList.add('rp-state-input');
     if (state === 'results') panel.classList.add('open');
+
+    // Synchronize mobile hint pill
+    const mobileHint = document.getElementById('map-mobile-hint');
+    if (mobileHint) {
+        if (state === 'placeholder') {
+            mobileHint.style.display = '';
+        } else {
+            mobileHint.style.display = 'none';
+        }
+    }
+
     setTimeout(() => { if (map) map.invalidateSize(); }, 320);
 }
 

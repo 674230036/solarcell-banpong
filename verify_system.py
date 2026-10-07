@@ -3,6 +3,8 @@ System verification script - checks all calculations and bugs.
 """
 import sys
 sys.path.insert(0, r'c:\xampp\htdocs\Solasell10-5-main\Solasell10-5-main')
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 import predict as pr
 import financial_engine as fe
 

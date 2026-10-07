@@ -142,24 +142,66 @@ async function loadRecentHistory() {
     try {
         const data = await apiFetch('/api/history');
         const tbody = document.getElementById('recent-tbody');
-        if (!tbody) return;
+        const mobileContainer = document.getElementById('recent-mobile-cards');
+        if (!tbody && !mobileContainer) return;
 
         if (!data.length) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">
-                <i class="bi bi-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:.4;"></i>
-                ยังไม่มีข้อมูลการวิเคราะห์ – <a href="/map" style="color:var(--secondary);">เริ่มวิเคราะห์พื้นที่</a>
-            </td></tr>`;
+            const emptyMsg = `
+                <div style="text-align:center;color:var(--text-muted);padding:24px;">
+                    <i class="bi bi-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:.4;"></i>
+                    ยังไม่มีข้อมูลการวิเคราะห์ – <a href="/map" style="color:var(--secondary);">เริ่มวิเคราะห์พื้นที่</a>
+                </div>`;
+            if (tbody) tbody.innerHTML = `<tr><td colspan="6">${emptyMsg}</td></tr>`;
+            if (mobileContainer) mobileContainer.innerHTML = emptyMsg;
             return;
         }
-        tbody.innerHTML = data.slice(0, 5).map(r => `
-            <tr>
-                <td><a href="/analysis/${r.id}" style="color:var(--secondary);font-weight:500;">${r.address || '–'}</a></td>
-                <td><span class="stars-display" style="font-size:13px;">${renderStars(r.suitability || 0)}</span></td>
-                <td>${fmt.num(r.current_daily || 0)} kWh</td>
-                <td>${fmt.int(r.annual_kwh || 0)} kWh</td>
-                <td style="color:var(--primary-dark);font-weight:600;">${fmt.thb(r.annual_save || 0)}</td>
-                <td><span class="badge badge-green">${fmt.pct(r.roi || 0)}</span></td>
-            </tr>`).join('');
+
+        const recent = data.slice(0, 5);
+
+        // 1. Desktop Table
+        if (tbody) {
+            tbody.innerHTML = recent.map(r => `
+                <tr>
+                    <td><a href="/analysis/${r.id}" style="color:var(--secondary);font-weight:600;">${r.address || '–'}</a></td>
+                    <td><span class="stars-display" style="font-size:13px;">${renderStars(r.suitability || 0)}</span></td>
+                    <td>${fmt.num(r.current_daily || 0)} kWh</td>
+                    <td>${fmt.int(r.annual_kwh || 0)} kWh</td>
+                    <td style="color:var(--primary-dark);font-weight:700;">${fmt.thb(r.annual_save || 0)}</td>
+                    <td><span class="badge badge-green">${fmt.pct(r.roi || 0)}</span></td>
+                </tr>`).join('');
+        }
+
+        // 2. Mobile Cards
+        if (mobileContainer) {
+            mobileContainer.innerHTML = recent.map(r => `
+                <div class="audit-mobile-card" style="margin-bottom:8px;">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <a href="/analysis/${r.id}" style="font-weight:700;font-size:14px;color:var(--secondary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            ${r.address || 'บ้านโป่ง, ราชบุรี'}
+                        </a>
+                        <span class="stars-display" style="font-size:12px;margin-left:8px;">${renderStars(r.suitability || 0)}</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;background:rgba(0,0,0,0.25);padding:8px;border-radius:8px;text-align:center;">
+                        <div>
+                            <div style="font-size:9.5px;color:var(--text-muted);">ผลิต / วัน</div>
+                            <div style="font-size:13px;font-weight:700;color:#f8fafc;">${fmt.num(r.current_daily || 0)} <small>kWh</small></div>
+                        </div>
+                        <div>
+                            <div style="font-size:9.5px;color:var(--text-muted);">ประหยัด / ปี</div>
+                            <div style="font-size:13px;font-weight:800;color:#34d399;">${fmt.thb(r.annual_save || 0)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:9.5px;color:var(--text-muted);">ROI</div>
+                            <div style="font-size:13px;font-weight:700;color:#38bdf8;">${fmt.pct(r.roi || 0)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:right;margin-top:2px;">
+                        <a href="/analysis/${r.id}" class="btn btn-ghost btn-sm" style="font-size:11.5px;padding:3px 10px;color:var(--secondary);border-color:rgba(56,189,248,0.3);">
+                            ดูรายละเอียด <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>`).join('');
+        }
     } catch (e) {
         console.error('Recent history error:', e);
     }

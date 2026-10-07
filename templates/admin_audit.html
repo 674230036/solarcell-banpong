@@ -57,9 +57,9 @@
         </div>
     </div>
 
-    <!-- Audit Table Card -->
-    <div class="card" style="padding: 20px;">
-        <div style="overflow-x: auto;">
+    <!-- Desktop Audit Table Card (≥ 769px) -->
+    <div class="card audit-desktop-card" style="padding: 20px;">
+        <div class="table-responsive" style="overflow-x: auto;">
             <table class="table" id="auditTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
                 <thead>
                     <tr style="border-bottom: 2px solid rgba(148, 163, 184, 0.2); color: #94a3b8; text-align: left;">
@@ -79,7 +79,7 @@
                 <tbody>
                     {% if history %}
                         {% for r in history %}
-                        <tr class="audit-row" style="border-bottom: 1px solid rgba(148, 163, 184, 0.08); color: #e2e8f0;">
+                        <tr class="audit-row" data-kw="{{ r.recommended.kw if r.recommended else 5 }} kW" data-suit="{{ r.suitability or 0 }} ดาว" style="border-bottom: 1px solid rgba(148, 163, 184, 0.08); color: #e2e8f0;">
                             <td style="padding: 12px;"><code style="color: #38bdf8;">{{ r.id }}</code></td>
                             <td style="padding: 12px;">
                                 <div style="font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
@@ -142,6 +142,83 @@
             </table>
         </div>
     </div>
+
+    <!-- Mobile Audit Cards (≤ 768px) -->
+    <div class="audit-mobile-cards">
+        {% if history %}
+            {% for r in history %}
+            <div class="audit-mobile-card" data-kw="{{ r.recommended.kw if r.recommended else 5 }} kW" data-suit="{{ r.suitability or 0 }} ดาว">
+                <!-- Header: ID + Date -->
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-family:'Inter',sans-serif; font-size: 11px; font-weight: 700;">
+                        REF: #{{ r.id }}
+                    </span>
+                    <span style="font-size: 11.5px; color: var(--text-muted);">
+                        <i class="bi bi-clock"></i> {{ r.analyzed_date }} {{ r.analyzed_time }}
+                    </span>
+                </div>
+
+                <!-- Location Info -->
+                <div style="margin-bottom: 6px;">
+                    <a href="{{ url_for('analysis_detail', analysis_id=r.id) }}" style="font-weight: 700; font-size: 14.5px; color: #f8fafc; line-height: 1.35; display: block;">
+                        <i class="bi bi-geo-alt-fill text-green"></i> {{ r.address }}
+                    </a>
+                    <div style="font-size: 11px; color: #94a3b8; font-family: 'Inter', sans-serif; margin-top: 2px;">
+                        {{ r.lat }}°N, {{ r.lng }}°E
+                    </div>
+                </div>
+
+                <!-- System & Bill Pill Row -->
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2" style="background: rgba(15,23,42,0.6); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <span style="font-size: 12px; color: #cbd5e1;">
+                        ค่าไฟ: <strong style="color: #fbbf24; font-family: 'Inter', sans-serif;">฿{{ "{:,}".format(r.monthly_bill or 0) }}</strong> / ด.
+                    </span>
+                    <span style="padding: 2px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700; font-size: 12px;">
+                        {{ r.recommended.kw if r.recommended else 5 }} kW (แนะนำ)
+                    </span>
+                </div>
+
+                <!-- 4 Metrics Grid -->
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; background: rgba(0,0,0,0.25); padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.04); text-align: center;">
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted);">ผลิต / วัน</div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #f8fafc; font-family: 'Inter', sans-serif;">{{ "{:,.2f}".format(r.current_daily or 0) }} kWh</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted);">ผลิต / ปี</div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #38bdf8; font-family: 'Inter', sans-serif;">{{ "{:,.0f}".format(r.annual_kwh or 0) }} kWh</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted);">ประหยัด / ปี</div>
+                        <div style="font-size: 13.5px; font-weight: 800; color: #34d399; font-family: 'Inter', sans-serif;">฿{{ "{:,}".format(r.annual_save or 0) }}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 10px; color: var(--text-muted);">คืนทุน (ROI)</div>
+                        <div style="font-size: 13.5px; font-weight: 700; color: #fbbf24; font-family: 'Inter', sans-serif;">{{ r.breakeven }} ปี ({{ r.roi }}%)</div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('analysis_detail', analysis_id=r.id) }}" class="btn btn-primary btn-sm flex-1" style="justify-content: center; font-size: 12px; font-weight: 600;">
+                        <i class="bi bi-box-arrow-up-right"></i> เปิดรายงาน
+                    </a>
+                    <button onclick='inspectRecord({{ r | tojson }})' class="btn btn-ghost btn-sm" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); font-size: 12px;" title="ดู JSON">
+                        <i class="bi bi-code-slash"></i> JSON
+                    </button>
+                    <button onclick="deleteRecord('{{ r.id }}')" class="btn btn-ghost btn-sm" style="color: #f87171; border-color: rgba(239, 68, 68, 0.3); padding: 4px 10px;" title="ลบรายการ">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="card p-4 text-center" style="color: var(--text-muted);">
+                <i class="bi bi-folder2-open fs-2 d-block mb-2"></i>
+                ยังไม่มีข้อมูลการวิเคราะห์ในระบบ
+            </div>
+        {% endif %}
+    </div>
 </div>
 
 <!-- Modal: JSON Inspector -->
@@ -168,22 +245,36 @@
 {% block scripts %}
 <script>
 function filterAuditTable() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
+    const search = document.getElementById('searchInput').value.toLowerCase().trim();
     const kwFilter = document.getElementById('filterKw').value;
-    const rows = document.querySelectorAll('.audit-row');
+    const suitFilter = document.getElementById('filterSuitability').value;
 
+    // Filter table rows
+    const rows = document.querySelectorAll('.audit-row');
     rows.forEach(row => {
         const text = row.innerText.toLowerCase();
         const kwCell = row.querySelector('.kw-cell')?.innerText || '';
+        const suitData = row.getAttribute('data-suit') || '';
         
-        const matchSearch = text.includes(search);
+        const matchSearch = !search || text.includes(search);
         const matchKw = !kwFilter || kwCell.includes(kwFilter);
+        const matchSuit = !suitFilter || suitData.includes(suitFilter);
 
-        if (matchSearch && matchKw) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
+        row.style.display = (matchSearch && matchKw && matchSuit) ? '' : 'none';
+    });
+
+    // Filter mobile cards
+    const cards = document.querySelectorAll('.audit-mobile-card');
+    cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        const kw = card.getAttribute('data-kw') || '';
+        const suit = card.getAttribute('data-suit') || '';
+
+        const matchSearch = !search || text.includes(search);
+        const matchKw = !kwFilter || kw.includes(kwFilter);
+        const matchSuit = !suitFilter || suit.includes(suitFilter);
+
+        card.style.display = (matchSearch && matchKw && matchSuit) ? 'flex' : 'none';
     });
 }
 

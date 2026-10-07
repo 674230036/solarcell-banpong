@@ -87,49 +87,49 @@
                     </div>
 
                     <!-- System Costs Grid -->
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));gap:10px;margin-bottom:20px;">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(90px, 1fr));gap:10px;margin-bottom:20px;">
                         <div>
                             <label for="cost_3kw" style="text-align:center;display:block;margin-bottom:6px;">
                                 <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">3 kW</span>
                             </label>
                             <input type="number" id="cost_3kw" step="1000" min="10000" max="999999"
-                                   value="{{ settings.system_costs.get('3', 95000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                                   value="{{ settings.system_costs.get('3', 95000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px 4px; border-radius: 8px; width: 100%; font-size: 13px;">
                         </div>
                         <div>
                             <label for="cost_5kw" style="text-align:center;display:block;margin-bottom:6px;">
                                 <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#34d399;">5 kW ⭐</span>
                             </label>
                             <input type="number" id="cost_5kw" step="1000" min="10000" max="999999"
-                                   value="{{ settings.system_costs.get('5', 150000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1.5px solid #10b981; color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                                   value="{{ settings.system_costs.get('5', 150000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1.5px solid #10b981; color: #fff; padding: 8px 4px; border-radius: 8px; width: 100%; font-size: 13px;">
                         </div>
                         <div>
                             <label for="cost_10kw" style="text-align:center;display:block;margin-bottom:6px;">
                                 <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">10 kW</span>
                             </label>
                             <input type="number" id="cost_10kw" step="1000" min="10000" max="999999"
-                                   value="{{ settings.system_costs.get('10', 250000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                                   value="{{ settings.system_costs.get('10', 250000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px 4px; border-radius: 8px; width: 100%; font-size: 13px;">
                         </div>
                         <div>
                             <label for="cost_15kw" style="text-align:center;display:block;margin-bottom:6px;">
                                 <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">15 kW</span>
                             </label>
                             <input type="number" id="cost_15kw" step="1000" min="10000" max="999999"
-                                   value="{{ settings.system_costs.get('15', 350000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                                   value="{{ settings.system_costs.get('15', 350000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px 4px; border-radius: 8px; width: 100%; font-size: 13px;">
                         </div>
                         <div>
                             <label for="cost_20kw" style="text-align:center;display:block;margin-bottom:6px;">
                                 <span style="display:block;font-size:16px;font-weight:800;font-family:'Inter',sans-serif;color:#f8fafc;">20 kW</span>
                             </label>
                             <input type="number" id="cost_20kw" step="1000" min="10000" max="999999"
-                                   value="{{ settings.system_costs.get('20', 440000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px; border-radius: 8px; width: 100%; font-size: 13px;">
+                                   value="{{ settings.system_costs.get('20', 440000) }}" style="text-align:center;background: rgba(15,23,42,0.8); border: 1px solid rgba(148,163,184,0.25); color: #fff; padding: 8px 4px; border-radius: 8px; width: 100%; font-size: 13px;">
                         </div>
                     </div>
 
-                    <div style="display:flex;gap:10px;">
-                        <button onclick="saveSettings()" class="btn btn-primary" id="save-btn" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; color: #fff;">
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button onclick="saveSettings()" class="btn btn-primary" id="save-btn" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 700; padding: 10px 20px; border-radius: 8px; color: #fff; flex: 1; min-width: 140px; justify-content: center;">
                             <i class="bi bi-check-lg"></i> บันทึกการตั้งค่า
                         </button>
-                        <button onclick="resetDefaults()" class="btn btn-ghost" style="padding: 10px 18px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.25);">
+                        <button onclick="resetDefaults()" class="btn btn-ghost" style="padding: 10px 18px; border-radius: 8px; border: 1px solid rgba(148,163,184,0.25); flex: 1; min-width: 140px; justify-content: center;">
                             <i class="bi bi-arrow-counterclockwise"></i> คืนค่าเริ่มต้น
                         </button>
                     </div>

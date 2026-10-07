@@ -4,13 +4,13 @@
 
 {% block content %}
 <div class="page-wrapper">
-    <div class="page-header d-flex justify-content-between align-items-center">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h1>ออกรายงาน</h1>
             <p>ส่งออกข้อมูลการวิเคราะห์พลังงานแสงอาทิตย์เป็นไฟล์ Excel พร้อมกราฟ</p>
         </div>
         {% if history %}
-        <a href="/api/export/excel/all" class="btn btn-primary">
+        <a href="/api/export/excel/all" class="btn btn-primary" style="white-space:nowrap;">
             <i class="bi bi-file-earmark-excel-fill"></i> ส่งออก Excel ทั้งหมด
         </a>
         {% endif %}
@@ -73,7 +73,8 @@
             </div>
 
             {% if history %}
-            <div style="overflow-x:auto;">
+            <!-- Desktop Table (≥ 769px) -->
+            <div class="report-desktop-table table-responsive">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -120,6 +121,55 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Cards (≤ 768px) -->
+            <div class="report-mobile-cards">
+                {% for r in history %}
+                <div class="report-item-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+                        <div style="flex:1;min-width:0;">
+                            <a href="/analysis/{{ r.id }}" style="font-weight:700;font-size:14.5px;color:var(--secondary);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                {{ r.address or 'บ้านโป่ง, ราชบุรี' }}
+                            </a>
+                            <div style="font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'Inter',sans-serif;">
+                                <i class="bi bi-geo-alt-fill text-green"></i> {{ r.lat | round(4) }}°N, {{ r.lng | round(4) }}°E
+                            </div>
+                        </div>
+                        <div style="text-align:right;white-space:nowrap;font-size:11.5px;color:var(--text-muted);">
+                            <div>{{ r.analyzed_date or '–' }}</div>
+                            <small>{{ r.analyzed_time or '' }}</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid" style="grid-template-columns:repeat(3, 1fr);gap:8px;background:rgba(15,23,42,0.6);padding:10px;border-radius:10px;margin-bottom:12px;border:1px solid rgba(255,255,255,0.06);text-align:center;">
+                        <div>
+                            <div style="font-size:10px;color:var(--text-muted);">ผลิต / ปี</div>
+                            <div style="font-size:13.5px;font-weight:700;color:#f8fafc;font-family:'Inter',sans-serif;">{{ "{:,.0f}".format(r.annual_kwh or 0) }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--text-muted);">ประหยัด / ปี</div>
+                            <div style="font-size:13.5px;font-weight:800;color:#34d399;font-family:'Inter',sans-serif;">฿{{ "{:,.0f}".format(r.annual_save or 0) }}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;color:var(--text-muted);">คืนทุน (ROI)</div>
+                            <div style="font-size:13.5px;font-weight:700;color:#38bdf8;font-family:'Inter',sans-serif;">{{ r.breakeven or '–' }} ปี</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="/report/document/{{ r.id }}" target="_blank" class="btn btn-sm flex-1" style="background:linear-gradient(135deg, #10b981, #059669);color:white;font-weight:700;justify-content:center;">
+                            <i class="bi bi-file-earmark-pdf"></i> รายงาน PDF
+                        </a>
+                        <a href="/api/export/excel/{{ r.id }}" class="btn btn-ghost btn-sm" style="color:var(--primary-dark);border-color:var(--primary-mid);">
+                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        </a>
+                        <a href="/analysis/{{ r.id }}" class="btn btn-ghost btn-sm" title="ดูผลวิเคราะห์">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">

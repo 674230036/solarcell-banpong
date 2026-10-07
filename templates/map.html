@@ -20,37 +20,50 @@
                 <div class="search-results" id="search-results" style="display:none;"></div>
             </div>
 
-            <!-- Quick Tambon Dropdown -->
-            <div class="tambon-quick-select-wrap">
-                <select id="tambon-selector" onchange="jumpToTambon(this.value)" style="background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(148,163,184,0.3); color: #f8fafc; padding: 7px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer;">
-                    <option value="">📍 เลือกตำบลใน อ.บ้านโป่ง...</option>
-                    <option value="13.8160,99.8770,ต.บ้านโป่ง">ต.บ้านโป่ง (ใจกลางเมือง)</option>
-                    <option value="13.8050,99.8520,ต.ท่าผา">ต.ท่าผา (ริมแม่น้ำแม่กลอง)</option>
-                    <option value="13.8340,99.8650,ต.เบิกไพร">ต.เบิกไพร</option>
-                    <option value="13.8180,99.8980,ต.ปากแรต">ต.ปากแรต</option>
-                    <option value="13.8450,99.9210,ต.หนองกบ">ต.หนองกบ</option>
-                    <option value="13.7910,99.9050,ต.หนองอ้อ">ต.หนองอ้อ</option>
-                    <option value="13.7820,99.9320,ต.ดอนกระเบื้อง">ต.ดอนกระเบื้อง</option>
-                    <option value="13.9120,99.8820,ต.กรับใหญ่">ต.กรับใหญ่</option>
-                    <option value="13.8090,99.8710,ต.สวนกล้วย">ต.สวนกล้วย</option>
-                    <option value="13.7830,99.8760,ต.นครชุมน์">ต.นครชุมน์</option>
-                    <option value="13.7650,99.8640,ต.บ้านม่วง">ต.บ้านม่วง</option>
-                    <option value="13.7520,99.8510,ต.คุ้งพยอม">ต.คุ้งพยอม</option>
-                    <option value="13.8560,99.8240,ต.หนองปลาหมอ">ต.หนองปลาหมอ</option>
-                    <option value="13.8820,99.7820,ต.เขาขลุง">ต.เขาขลุง</option>
-                    <option value="13.8290,99.8150,ต.ลาดบัวขาว">ต.ลาดบัวขาว</option>
-                </select>
-            </div>
+            <div class="map-topbar-actions">
+                <!-- Quick Tambon Dropdown -->
+                <div class="tambon-quick-select-wrap">
+                    <select id="tambon-selector" onchange="jumpToTambon(this.value)">
+                        <option value="">📍 เลือกตำบลใน อ.บ้านโป่ง...</option>
+                        <option value="13.8160,99.8770,ต.บ้านโป่ง">ต.บ้านโป่ง (ใจกลางเมือง)</option>
+                        <option value="13.8050,99.8520,ต.ท่าผา">ต.ท่าผา (ริมแม่น้ำแม่กลอง)</option>
+                        <option value="13.8340,99.8650,ต.เบิกไพร">ต.เบิกไพร</option>
+                        <option value="13.8180,99.8980,ต.ปากแรต">ต.ปากแรต</option>
+                        <option value="13.8450,99.9210,ต.หนองกบ">ต.หนองกบ</option>
+                        <option value="13.7910,99.9050,ต.หนองอ้อ">ต.หนองอ้อ</option>
+                        <option value="13.7820,99.9320,ต.ดอนกระเบื้อง">ต.ดอนกระเบื้อง</option>
+                        <option value="13.9120,99.8820,ต.กรับใหญ่">ต.กรับใหญ่</option>
+                        <option value="13.8090,99.8710,ต.สวนกล้วย">ต.สวนกล้วย</option>
+                        <option value="13.7830,99.8760,ต.นครชุมน์">ต.นครชุมน์</option>
+                        <option value="13.7650,99.8640,ต.บ้านม่วง">ต.บ้านม่วง</option>
+                        <option value="13.7520,99.8510,ต.คุ้งพยอม">ต.คุ้งพยอม</option>
+                        <option value="13.8560,99.8240,ต.หนองปลาหมอ">ต.หนองปลาหมอ</option>
+                        <option value="13.8820,99.7820,ต.เขาขลุง">ต.เขาขลุง</option>
+                        <option value="13.8290,99.8150,ต.ลาดบัวขาว">ต.ลาดบัวขาว</option>
+                    </select>
+                </div>
 
-            <button class="map-btn" id="location-btn" title="ตำแหน่งปัจจุบัน">
-                <i class="bi bi-crosshair2"></i> ตำแหน่งฉัน
-            </button>
+                <button class="map-btn" id="location-btn" title="ตำแหน่งปัจจุบัน" type="button">
+                    <i class="bi bi-crosshair2"></i> ตำแหน่งฉัน
+                </button>
+            </div>
         </div>
 
         <!-- Floating District Badge -->
-        <div style="position: absolute; bottom: 20px; left: 20px; z-index: 1000; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(52,211,153,0.3); font-size: 11.5px; color: #e2e8f0; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+        <div class="map-district-badge" id="map-district-badge">
             <span class="pulse-dot"></span>
             <span>ขอบเขตศึกษา: <strong>อ.บ้านโป่ง จ.ราชบุรี (15 ตำบล)</strong></span>
+        </div>
+
+        <!-- Mobile Quick Hint Pill (Active on Mobile/Tablet when no site picked yet) -->
+        <div class="map-placeholder-hint" id="map-mobile-hint">
+            <div style="display:flex;align-items:center;gap:8px;overflow:hidden;">
+                <span class="pulse-dot"></span>
+                <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">แตะบนแผนที่ หรือเลือกตำบล เพื่อเริ่มวิเคราะห์</span>
+            </div>
+            <button type="button" onclick="document.getElementById('tambon-selector').focus()" class="btn-tambon-shortcut">
+                เลือกตำบล
+            </button>
         </div>
 
         <!-- Loading Overlay -->
@@ -77,13 +90,18 @@
 
         <!-- ══ STATE 2: Financial & Site Input ════════════════════════ -->
         <div class="rp-input">
-            <!-- Selected location header -->
+            <!-- Selected location header with mobile close button -->
             <div class="rp-input-loc" id="rp-input-loc">
-                <div class="rp-input-loc-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                <div class="rp-input-loc-info">
-                    <div class="rp-input-addr" id="rp-input-address">–</div>
-                    <div class="rp-input-coords-text" id="rp-input-coords">–</div>
+                <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1;">
+                    <div class="rp-input-loc-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                    <div class="rp-input-loc-info" style="overflow: hidden;">
+                        <div class="rp-input-addr" id="rp-input-address">–</div>
+                        <div class="rp-input-coords-text" id="rp-input-coords">–</div>
+                    </div>
                 </div>
+                <button type="button" class="rp-close" onclick="closePanel()" title="ปิดและกลับไปแผนที่" aria-label="ปิด">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
 
             <!-- Input form -->
@@ -109,7 +127,7 @@
                         <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;">
                             <i class="bi bi-lightning-charge-fill" style="color:var(--amber);"></i> ค่าไฟยอดนิยม:
                         </div>
-                        <div class="bill-presets-grid" style="display:grid;grid-template-columns:repeat(5, 1fr);gap:5px;">
+                        <div class="bill-presets-grid">
                             <button type="button" class="bill-preset-btn" data-bill="3000">
                                 <strong>฿3,000</strong>
                                 <small>3 kW</small>
@@ -338,5 +356,5 @@ function jumpToTambon(val) {
     }
 }
 </script>
-<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}?v=20261007_v7"></script>
 {% endblock %}

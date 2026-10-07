@@ -6,19 +6,19 @@
 <div class="page-wrapper">
 
     <!-- Page Header -->
-    <div class="page-header d-flex justify-content-between align-items-center">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h1>แดชบอร์ด</h1>
             <p>ภาพรวมระบบวิเคราะห์พลังงานแสงอาทิตย์ อำเภอบ้านโป่ง จังหวัดราชบุรี</p>
         </div>
-        <a href="{{ url_for('gis_map') }}" class="btn btn-primary">
+        <a href="{{ url_for('gis_map') }}" class="btn btn-primary" style="white-space:nowrap;">
             <i class="bi bi-map-fill"></i> วิเคราะห์พื้นที่ใหม่
         </a>
     </div>
 
     <!-- Hero Banner with Real Project Feel -->
     <div class="highlight-box mb-4" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 45%, #1e3a8a 100%);">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;position:relative;z-index:2;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;position:relative;z-index:2;">
             <div style="max-width:620px;">
                 <div class="hero-photo-badge">
                     <i class="bi bi-patch-check-fill" style="color:#34d399;"></i> โครงงานสหกิจศึกษา / งานวิจัยภาคสนามจริง
@@ -38,18 +38,18 @@
                 </div>
             </div>
             
-            <div style="display:flex;gap:14px;align-items:center;background:rgba(0,0,0,0.25);backdrop-filter:blur(8px);padding:14px 20px;border-radius:14px;border:1px solid rgba(255,255,255,0.15);">
-                <div style="text-align:center;color:white;">
+            <div class="hero-stats-box" style="display:flex;gap:14px;align-items:center;background:rgba(0,0,0,0.25);backdrop-filter:blur(8px);padding:14px 20px;border-radius:14px;border:1px solid rgba(255,255,255,0.15);">
+                <div style="text-align:center;color:white;flex:1;">
                     <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;line-height:1;color:#34d399;">94.3%</div>
                     <div style="font-size:11px;opacity:.8;margin-top:4px;">R² Score</div>
                 </div>
                 <div style="height:36px;width:1px;background:rgba(255,255,255,0.2);"></div>
-                <div style="text-align:center;color:white;">
+                <div style="text-align:center;color:white;flex:1;">
                     <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;line-height:1;color:#60a5fa;">500</div>
                     <div style="font-size:11px;opacity:.8;margin-top:4px;">Trees</div>
                 </div>
                 <div style="height:36px;width:1px;background:rgba(255,255,255,0.2);"></div>
-                <div style="text-align:center;color:white;">
+                <div style="text-align:center;color:white;flex:1;">
                     <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;line-height:1;color:#fbbf24;">5.12</div>
                     <div style="font-size:11px;opacity:.8;margin-top:4px;">PSS แดดเฉลี่ย</div>
                 </div>
@@ -59,7 +59,7 @@
 
     <!-- KPI Row -->
     <div class="row g-3 mb-4">
-        <div class="col-xl-2 col-sm-6">
+        <div class="col-xl-2 col-md-4 col-6">
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="bi bi-lightning-charge-fill"></i></div>
                 <div class="kpi-label">การวิเคราะห์ทั้งหมด</div>
@@ -67,7 +67,7 @@
                 <div class="kpi-sub">จุดที่วิเคราะห์แล้ว</div>
             </div>
         </div>
-        <div class="col-xl-2 col-sm-6">
+        <div class="col-xl-2 col-md-4 col-6">
             <div class="kpi-card kpi-blue">
                 <div class="kpi-icon icon-blue"><i class="bi bi-sun-fill"></i></div>
                 <div class="kpi-label">ผลิตเฉลี่ย / วัน</div>
@@ -75,7 +75,7 @@
                 <div class="kpi-sub">ระบบที่แนะนำเฉลี่ย</div>
             </div>
         </div>
-        <div class="col-xl-2 col-sm-6">
+        <div class="col-xl-2 col-md-4 col-6">
             <div class="kpi-card">
                 <div class="kpi-icon"><i class="bi bi-calendar-check-fill"></i></div>
                 <div class="kpi-label">ผลิตเฉลี่ย / ปี</div>
@@ -83,7 +83,7 @@
                 <div class="kpi-sub">จากทุกการวิเคราะห์</div>
             </div>
         </div>
-        <div class="col-xl-2 col-sm-6">
+        <div class="col-xl-2 col-md-4 col-6">
             <div class="kpi-card kpi-amber">
                 <div class="kpi-icon icon-amber"><i class="bi bi-piggy-bank-fill"></i></div>
                 <div class="kpi-label">ประหยัดเฉลี่ย / ปี</div>
@@ -91,7 +91,7 @@
                 <div class="kpi-sub">ค่าไฟที่ประหยัดได้</div>
             </div>
         </div>
-        <div class="col-xl-2 col-sm-6">
+        <div class="col-xl-2 col-md-4 col-6">
             <div class="kpi-card kpi-purple">
                 <div class="kpi-icon icon-purple"><i class="bi bi-graph-up-arrow"></i></div>
                 <div class="kpi-label">ROI เฉลี่ย</div>
@@ -99,7 +99,7 @@
                 <div class="kpi-sub">ผลตอบแทนต่อปี</div>
             </div>
         </div>
-        <div class="col-xl-2 col-sm-6">
+        <div class="col-xl-2 col-md-4 col-6">
             <div class="kpi-card kpi-blue">
                 <div class="kpi-icon icon-blue"><i class="bi bi-hourglass-split"></i></div>
                 <div class="kpi-label">คืนทุนเฉลี่ย</div>
@@ -327,7 +327,8 @@
                     ดูทั้งหมด <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
-            <div style="overflow-x:auto;">
+            <!-- Desktop Table (≥ 769px) -->
+            <div class="dashboard-recent-table table-responsive" style="overflow-x:auto;">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -347,6 +348,10 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Mobile Cards (≤ 768px) -->
+            <div id="recent-mobile-cards" class="dashboard-recent-cards">
             </div>
         </div>
     </div>
