@@ -1,6 +1,3 @@
-# Documentation / Presentation files
-PROJECT_DOCUMENTATION.html
-
 # Python cache & environments
 __pycache__/
 *.py[cod]
@@ -9,14 +6,11 @@ __pycache__/
 venv/
 ENV/
 
-# Temp & testing files
-test_*.py
-test_*.xlsx
-test03.ipynb
+# Duplicate folder & zip archives
 project2/
-*.bat
 *.zip
 
 # OS files
 .DS_Store
 Thumbs.db
+
